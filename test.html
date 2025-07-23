@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Character Intro - Aspect Ratio Fixed</title>
+    <style>
+        /* --- 기본 및 스크롤 애니메이션 스타일 (변경 없음) --- */
+        body {
+            margin: 0;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            background-color: #000000;
+            color: #a7c7e7;
+        }
+        header.intro-header { height: 100vh; }
+        .gif-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('test.gif'); background-size: cover; background-position: center;
+        }
+        .value-vault {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8vw; font-weight: bold; margin: 0;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+            z-index: 10; 
+        }
+
+        /* --- 캐릭터 소개 섹션 스타일 (수정됨) --- */
+        main { position: relative; background-color: #000000; }
+        .split-section-container {
+            width: 100%; height: 100vh; display: flex;
+            overflow: hidden; background-color: #1a1a1a;
+        }
+        .split-panel {
+            width: 50%; height: 100%; position: relative;
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .panel-content {
+            position: absolute; width: 100%;
+            padding: 40px; box-sizing: border-box; text-align: center;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .panel-content h2 { font-size: 4vw; margin-bottom: 20px; }
+        .panel-content p { font-size: 1.2vw; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto; }
+
+        /* --- 이미지 레이아웃 수정 (핵심 변경사항) --- */
+        
+        /* 1. 이미지 액자(컨테이너) 스타일 */
+        .image-container {
+            width: 100%;
+            max-width: 300px; /* 액자의 최대 너비 */
+            height: 300px;    /* 액자의 높이를 고정 (가장 중요!) */
+            margin: 30px auto 0; /* 위쪽 여백, 가로 중앙 정렬 */
+            border-radius: 10px;
+            overflow: hidden; /* 액자를 벗어나는 이미지를 숨김 */
+            
+            /* 애니메이션을 위한 초기 상태 (이미지 대신 컨테이너에 적용) */
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            transition-delay: 0.2s;
+        }
+
+        /* 2. 실제 이미지 스타일 */
+        .character-image {
+            width: 100%;
+            height: 100%;
+            /* 핵심: 비율을 유지한 채 액자를 가득 채움 */
+            object-fit: cover; 
+        }
+        
+        /* --- 호버 상태 CSS --- */
+        .split-section-container.hover-left #acheron-panel { transform: translateX(50%) scale(1.7); }
+        .split-section-container.hover-left #raiden-panel { transform: translateX(100%); }
+        .split-section-container.hover-right #raiden-panel { transform: translateX(-50%) scale(1.7); }
+        .split-section-container.hover-right #acheron-panel { transform: translateX(-100%); }
+        
+        /* 활성화된 패널의 이미지 컨테이너가 보이도록 설정 */
+        .split-section-container.hover-left #acheron-panel .image-container,
+        .split-section-container.hover-right #raiden-panel .image-container {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="intro-header">
+        <div class="gif-background"></div>
+        <h1 class="value-vault">Value Vault</h1>
+    </header>
+
+    <main>
+        <section class="split-section-container" id="character-intro">
+            <div class="split-panel" id="acheron-panel">
+                <div class="panel-content">
+                    <h2>아케론</h2>
+                    <p>공허의 사도. 페나코니 갈랏도르 <br> 허구개맛돌이.</p>
+                    <!-- 이미지를 제어할 컨테이너로 감쌉니다. -->
+                    <div class="image-container">
+                        <img src="acheron.jpg" alt="아케론" class="character-image">
+                    </div>
+                </div>
+            </div>
+            <div class="split-panel" id="raiden-panel">
+                <div class="panel-content">
+                    <h2>종려</h2>
+                    <p>바위의 신, 치매 독거노인 <br> 아쉽게도 까먹었어.</p>
+                    <!-- 여기도 동일한 컨테이너로 감쌉니다. -->
+                    <div class="image-container">
+                        <img src="zhongli.jpg" alt="종려" class="character-image">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- JS 코드는 변경할 필요가 없습니다. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.to(".value-vault", {
+            scrollTrigger: { trigger: ".intro-header", start: "top top", end: "bottom top", scrub: 1, },
+            scale: 0.3, y: -window.innerHeight / 2 + 50,
+        });
+        gsap.to(".gif-background", {
+            scrollTrigger: { trigger: ".intro-header", start: "top top", end: "bottom top", scrub: 1, },
+            opacity: 0,
+        });
+        const introContainer = document.getElementById('character-intro');
+        introContainer.addEventListener('mousemove', (e) => {
+            const containerWidth = introContainer.offsetWidth;
+            const x = e.clientX - introContainer.getBoundingClientRect().left;
+            if (x < containerWidth * 0.35) {
+                introContainer.classList.add('hover-left');
+                introContainer.classList.remove('hover-right');
+            } else if (x > containerWidth * 0.65) {
+                introContainer.classList.add('hover-right');
+                introContainer.classList.remove('hover-left');
+            } else {
+                introContainer.classList.remove('hover-left', 'hover-right');
+            }
+        });
+        introContainer.addEventListener('mouseleave', () => {
+            introContainer.classList.remove('hover-left', 'hover-right');
+        });
+    </script>
+</body>
+</html>
